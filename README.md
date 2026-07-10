@@ -23,6 +23,11 @@
         button:disabled { opacity: 0.5; cursor: not-allowed; }
         
         #result { margin-top: 25px; font-size: 22px; font-weight: bold; min-height: 35px; }
+        
+        .names-list { background: #1a1a1a; border: 2px solid #ff8800; border-radius: 15px; padding: 20px; margin-top: 30px; max-width: 400px; margin-left: auto; margin-right: auto; }
+        .names-list h2 { color: #ff8800; margin-top: 0; }
+        #takenNames { text-align: right; max-height: 200px; overflow-y: auto; }
+        #takenNames p { background: #0a0a0a; padding: 8px; border-radius: 8px; margin: 5px 0; color: #00ff88; }
     </style>
 </head>
 <body>
@@ -37,6 +42,11 @@
     </div>
     
     <div id="result"></div>
+
+    <div class="names-list">
+        <h2>📋 الاسماء المأخوذة</h2>
+        <div id="takenNames">جاري التحميل...</div>
+    </div>
 
     <script type="module" src="script.js"></script>
 </body>
