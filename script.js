@@ -29,8 +29,8 @@ async function loadAllData() {
 }
 
 function isNameValid(name) {
-    if (name.length < 7) return 'الاسم لازم 9 حروف اقل شي';
-    if (name.length > 12) return 'الاسم طويل جدا. اقصى شي 15';
+    if (name.length < 7) return 'الاسم لازم 7 حروف اقل شي';
+    if (name.length > 12) return 'الاسم طويل جدا. اقصى شي 12';
     if (bannedWords.some(word => name.includes(word))) return 'الاسم فيه كلمة ممنوعة';
     return null;
 }
