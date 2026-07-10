@@ -3,37 +3,47 @@ import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/fi
 
 const nameInput = document.getElementById('nameInput');
 const checkBtn = document.getElementById('checkBtn');
+const createBtn = document.getElementById('createBtn');
 const resultDiv = document.getElementById('result');
 
-checkBtn.addEventListener('click', async () => {
+async function checkName() {
     const name = nameInput.value.trim().toLowerCase();
-    if (name === '') {
-        resultDiv.innerText = '⚠️ اكتب اسم اول';
-        resultDiv.style.color = 'yellow';
-        return;
-    }
+    if (name === '') return showResult('⚠️ اكتب اسم اول', 'yellow');
     
-    resultDiv.innerText = 'جاري الفحص...';
-    resultDiv.style.color = 'white';
-    checkBtn.disabled = true;
-    
-    try {
-        const docRef = doc(db, "players", name);
-        const docSnap = await getDoc(docRef);
+    showResult('جاري الفحص...', 'white');
+    const docSnap = await getDoc(doc(db, "players", name));
 
-        if (docSnap.exists()) {
-            resultDiv.innerText = `❌ الاسم "${name}" متاخد`;
-            resultDiv.style.color = 'red';
-        } else {
-            await setDoc(docRef, { takenAt: serverTimestamp() });
-            resultDiv.innerText = `✅ الاسم "${name}" متاح وتم حجزه`;
-            resultDiv.style.color = '#00ff88';
-            nameInput.value = '';
-        }
-    } catch (error) {
-        resultDiv.innerText = 'خطأ في الاتصال. جرب تاني';
-        resultDiv.style.color = 'red';
-        console.log(error);
+    if (docSnap.exists()) {
+        showResult(`❌ الاسم "${name}" متاخد`, 'red');
+    } else {
+        showResult(`✅ الاسم "${name}" متاح تقدر تنشئه`, '#00ff88');
     }
-    checkBtn.disabled = false;
-});
+}
+
+async function createName() {
+    const name = nameInput.value.trim().toLowerCase();
+    if (name === '') return showResult('⚠️ اكتب اسم اول', 'yellow');
+    
+    showResult('جاري الانشاء...', 'white');
+    checkBtn.disabled = true; createBtn.disabled = true;
+    
+    const docRef = doc(db, "players", name);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        showResult(`❌ الاسم "${name}" متاخد خلاص`, 'red');
+    } else {
+        await setDoc(docRef, { takenAt: serverTimestamp() });
+        showResult(`✅ تم انشاء الاسم "${name}" بنجاح`, '#00ff88');
+        nameInput.value = '';
+    }
+    checkBtn.disabled = false; createBtn.disabled = false;
+}
+
+function showResult(text, color) {
+    resultDiv.innerText = text;
+    resultDiv.style.color = color;
+}
+
+checkBtn.addEventListener('click', checkName);
+createBtn.addEventListener('click', createName);
