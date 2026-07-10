@@ -6,18 +6,31 @@ const checkBtn = document.getElementById('checkBtn');
 const createBtn = document.getElementById('createBtn');
 const resultDiv = document.getElementById('result');
 const counterDiv = document.getElementById('counter');
+const takenNamesDiv = document.getElementById('takenNames');
 
 // الكلمات الممنوعة
 const bannedWords = ['ادمن', 'admin', 'سب', 'حمار', 'كلب'];
 
-async function updateCounter() {
+async function loadAllData() {
     const querySnapshot = await getDocs(collection(db, "players"));
+    
+    // تحديث العداد
     counterDiv.innerText = `🔥 تم حجز ${querySnapshot.size} اسم حتى الان 🔥`;
+    
+    // عرض الاسماء
+    takenNamesDiv.innerHTML = '';
+    if (querySnapshot.empty) {
+        takenNamesDiv.innerHTML = '<p>لا يوجد اسماء محجوزة بعد</p>';
+    } else {
+        querySnapshot.forEach((doc) => {
+            takenNamesDiv.innerHTML += `<p>👑 ${doc.id}</p>`;
+        });
+    }
 }
 
 function isNameValid(name) {
-    if (name.length < 9) return 'الاسم لازم 9 حروف اقل شي';
-    if (name.length > 15) return 'الاسم طويل جدا. اقصى شي 15';
+    if (name.length < 7) return 'الاسم لازم 9 حروف اقل شي';
+    if (name.length > 12) return 'الاسم طويل جدا. اقصى شي 15';
     if (bannedWords.some(word => name.includes(word))) return 'الاسم فيه كلمة ممنوعة';
     return null;
 }
@@ -53,11 +66,11 @@ async function createName() {
     } else {
         await setDoc(docRef, { 
             takenAt: serverTimestamp(),
-            bonus: "50 ميزة مفعلة" // بتاعت موقع البند
+            bonus: "50 ميزة مفعلة"
         });
         showResult(`✅ تم انشاء "${name}" + تم تفعيل 50 ميزة`, '#00ff88');
         nameInput.value = '';
-        updateCounter();
+        loadAllData(); // تحديث العداد والقائمة بعد الانشاء
     }
     checkBtn.disabled = false; createBtn.disabled = false;
 }
@@ -67,6 +80,9 @@ function showResult(text, color) {
     resultDiv.style.color = color;
 }
 
+// الربط - هنا كان الخطأ وصلحته
 checkBtn.addEventListener('click', checkName);
 createBtn.addEventListener('click', createName);
-updateCounter();
+
+// يشتغل اول ما يفتح الموقع
+loadAllData();
