@@ -29,16 +29,16 @@ async function loadAllData() {
 }
 
 function isNameValid(name) {
-    if (name.length < 7) return 'الاسم لازم 7 حروف اقل شي';
-    if (name.length > 12) return 'الاسم طويل جدا. اقصى شي 12';
-    if (bannedWords.some(word => name.includes(word))) return 'الاسم فيه كلمة ممنوعة';
+    if (name.length < 7) return '⚠️ الاسم لازم 7 حروف اقل شي';
+    if (name.length > 12) return '⚠️ الاسم طويل جدا. اقصى شي 12';
+    if (bannedWords.some(word => name.includes(word))) return '⚠️ الاسم فيه كلمة ممنوعة';
     return null;
 }
 
 async function checkName() {
     const name = nameInput.value.trim().toLowerCase();
     const error = isNameValid(name);
-    if (error) return showResult(`⚠️ ${error}`, 'yellow');
+    if (error) return showResult(error, 'yellow');
     
     showResult('جاري الفحص...', 'white');
     const docSnap = await getDoc(doc(db, "players", name));
@@ -53,7 +53,7 @@ async function checkName() {
 async function createName() {
     const name = nameInput.value.trim().toLowerCase();
     const error = isNameValid(name);
-    if (error) return showResult(`⚠️ ${error}`, 'yellow');
+    if (error) return showResult(error, 'yellow');
     
     showResult('جاري الانشاء...', 'white');
     checkBtn.disabled = true; createBtn.disabled = true;
@@ -70,7 +70,7 @@ async function createName() {
         });
         showResult(`✅ تم انشاء "${name}" + تم تفعيل 50 ميزة`, '#00ff88');
         nameInput.value = '';
-        loadAllData(); // تحديث العداد والقائمة بعد الانشاء
+        loadAllData(); // تحديث العداد والقائمة
     }
     checkBtn.disabled = false; createBtn.disabled = false;
 }
@@ -80,9 +80,6 @@ function showResult(text, color) {
     resultDiv.style.color = color;
 }
 
-// الربط - هنا كان الخطأ وصلحته
 checkBtn.addEventListener('click', checkName);
 createBtn.addEventListener('click', createName);
-
-// يشتغل اول ما يفتح الموقع
 loadAllData();
