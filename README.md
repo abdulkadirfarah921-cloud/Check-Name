@@ -34,7 +34,7 @@
     <h1>🔥 انشاء اسم اللاعب 🔥</h1>
     <div class="counter" id="counter">جاري تحميل العداد...</div>
     
-    <input type="text" id="nameInput" placeholder="اكتب اسمك 9 حروف على الاقل..." maxlength="15">
+    <input type="text" id="nameInput" placeholder="اكتب اسمك 7 الى 12 حرف..." maxlength="12">
     
     <div class="btn-group">
         <button id="checkBtn">فحص</button>
