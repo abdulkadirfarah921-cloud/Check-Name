@@ -2,31 +2,60 @@ import { db } from './firebase.js';
 import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const nameInput = document.getElementById('nameInput');
+const searchInput = document.getElementById('searchInput');
 const checkBtn = document.getElementById('checkBtn');
 const createBtn = document.getElementById('createBtn');
 const resultDiv = document.getElementById('result');
 const counterDiv = document.getElementById('counter');
 const takenNamesDiv = document.getElementById('takenNames');
 
-// الكلمات الممنوعة
+let allNames = []; // نحفظ كل الاسماء هنا عشان البحث
 const bannedWords = ['ادمن', 'admin', 'سب', 'حمار', 'كلب'];
 
 async function loadAllData() {
     const querySnapshot = await getDocs(collection(db, "players"));
+    allNames = [];
     
-    // تحديث العداد
     counterDiv.innerText = `🔥 تم حجز ${querySnapshot.size} اسم حتى الان 🔥`;
     
-    // عرض الاسماء
+    querySnapshot.forEach((doc) => {
+        allNames.push({id: doc.id, data: doc.data()});
+    });
+    
+    displayNames(allNames);
+}
+
+function displayNames(names) {
     takenNamesDiv.innerHTML = '';
-    if (querySnapshot.empty) {
-        takenNamesDiv.innerHTML = '<p>لا يوجد اسماء محجوزة بعد</p>';
+    if (names.length === 0) {
+        takenNamesDiv.innerHTML = '<p>لا يوجد اسماء</p>';
     } else {
-        querySnapshot.forEach((doc) => {
-            takenNamesDiv.innerHTML += `<p>👑 ${doc.id}</p>`;
+        names.forEach((item) => {
+            const date = item.data.takenAt ? new Date(item.data.takenAt.seconds * 1000).toLocaleDateString('ar-EG') : 'اليوم';
+            takenNamesDiv.innerHTML += `
+                <div class="name-item">
+                    <span>👑 ${item.id}</span>
+                    <div>
+                        <span class="date">${date}</span>
+                        <button class="copyBtn" onclick="copyName('${item.id}')">نسخ</button>
+                    </div>
+                </div>
+            `;
         });
     }
 }
+
+window.copyName = (name) => {
+    navigator.clipboard.writeText(name);
+    showResult(`✅ تم نسخ "${name}"`, '#00ff88');
+    setTimeout(() => resultDiv.innerText = '', 2000);
+}
+
+searchInput.addEventListener('input', (e) => {
+    const search = e.target.value.toLowerCase();
+    const filtered = allNames.filter(item => item.id.includes(search));
+    displayNames(filtered);
+});
 
 function isNameValid(name) {
     if (name.length < 7) return '⚠️ الاسم لازم 7 حروف اقل شي';
@@ -70,7 +99,7 @@ async function createName() {
         });
         showResult(`✅ تم انشاء "${name}" + تم تفعيل 50 ميزة`, '#00ff88');
         nameInput.value = '';
-        loadAllData(); // تحديث العداد والقائمة
+        loadAllData();
     }
     checkBtn.disabled = false; createBtn.disabled = false;
 }
